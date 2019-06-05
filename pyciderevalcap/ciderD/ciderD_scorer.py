@@ -8,10 +8,9 @@ from __future__ import print_function
 import copy
 from collections import defaultdict
 import numpy as np
-import pdb
 import math
 import six
-from six.moves import cPickle
+from six.moves import cPickle as pickle
 import os
 
 def precook(s, n=4, out=False):
@@ -76,8 +75,10 @@ class CiderScorer(object):
         self.ctest = []
         self.df_mode = df_mode
         self.ref_len = None
-        if self.df_mode != "corpus":
-            pkl_file = cPickle.load(open(os.path.join('data', df_mode + '.p'),'rb'), **(dict(encoding='latin1') if six.PY3 else {}))
+        if os.path.isfile(self.df_mode):
+            with open(self.df_mode, 'rb') as f:
+                pkl_file = pickle.load(
+                            f, **(dict(encoding='latin1') if six.PY3 else {}))
             self.ref_len = np.log(float(pkl_file['ref_len']))
             self.document_frequency = pkl_file['document_frequency']
         self.cook_append(test, refs)
@@ -97,7 +98,8 @@ class CiderScorer(object):
                 self.ctest.append(None) # lens of crefs and ctest have to match
 
     def size(self):
-        assert len(self.crefs) == len(self.ctest), "refs/test mismatch! %d<>%d" % (len(self.crefs), len(self.ctest))
+        assert len(self.crefs) == len(self.ctest), \
+            "refs/test mismatch! %d<>%d" % (len(self.crefs), len(self.ctest))
         return len(self.crefs)
 
     def __iadd__(self, other):
@@ -109,8 +111,8 @@ class CiderScorer(object):
         else:
             self.ctest.extend(other.ctest)
             self.crefs.extend(other.crefs)
-
         return self
+    
     def compute_doc_freq(self):
         '''
         Compute term frequency for reference data.
@@ -148,7 +150,7 @@ class CiderScorer(object):
 
                 if n == 1:
                     length += term_freq
-            norm = [np.sqrt(n) for n in norm]
+            norm = [np.sqrt(nm) for nm in norm]
             return vec, norm, length
 
         def sim(vec_hyp, vec_ref, norm_hyp, norm_ref, length_hyp, length_ref):
