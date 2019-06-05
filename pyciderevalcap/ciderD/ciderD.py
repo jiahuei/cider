@@ -11,7 +11,7 @@ from __future__ import division
 from __future__ import print_function
 
 from .ciderD_scorer import CiderScorer
-import pdb
+
 
 class CiderD:
     """
@@ -34,14 +34,15 @@ class CiderD:
                 ref_for_image (dict)  : dictionary with key <image> and value <tokenized reference sentence>
         :return: cider (float) : computed CIDEr score for the corpus
         """
-
+        
         # clear all the previous hypos and refs
         tmp_cider_scorer = self.cider_scorer.copy_empty()
         tmp_cider_scorer.clear()
-        for res_id in res:
-
-            hypo = res_id['caption']
-            ref = gts[res_id['image_id']]
+        
+        assert(sorted(gts.keys()) == sorted(res.keys()))
+        for id in gts:
+            hypo = res[id]
+            ref = gts[id]
 
             # Sanity check.
             assert(type(hypo) is list)
@@ -51,7 +52,7 @@ class CiderD:
             tmp_cider_scorer += (hypo[0], ref)
 
         (score, scores) = tmp_cider_scorer.compute_score()
-
+        
         return score, scores
 
     def method(self):
