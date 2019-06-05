@@ -45,10 +45,9 @@ class Cider:
         # clear all the previous hypos and refs
         self.cider_scorer.clear()
 
-        for res_id in res:
-
-            hypo = res_id['caption']
-            ref = gts[res_id['image_id']]
+        for id in gts:
+            hypo = res[id]
+            ref = gts[id]
 
             # Sanity check.
             assert(type(hypo) is list)
