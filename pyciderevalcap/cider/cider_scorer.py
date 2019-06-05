@@ -7,7 +7,7 @@ from __future__ import print_function
 
 import copy
 import six
-from six.moves import cPickle
+from six.moves import cPickle as pickle
 from collections import defaultdict
 import numpy as np
 import math
@@ -68,8 +68,10 @@ class CiderScorer(object):
         self.ctest = []
         self.df_mode = df_mode
         self.ref_len = None
-        if self.df_mode != "corpus":
-            pkl_file = cPickle.load(open(os.path.join('data', df_mode + '.p'),'rb'), **(dict(encoding='latin1') if six.PY3 else {}))
+        if os.path.isfile(self.df_mode):
+            with open(self.df_mode, 'rb') as f:
+                pkl_file = pickle.load(
+                            f, **(dict(encoding='latin1') if six.PY3 else {}))
             self.ref_len = np.log(float(pkl_file['ref_len']))
             self.document_frequency = pkl_file['document_frequency']
         self.cook_append(test, refs)
@@ -141,7 +143,7 @@ class CiderScorer(object):
 
                 if n == 1:
                     length += term_freq
-            norm = [np.sqrt(n) for n in norm]
+            norm = [np.sqrt(nm) for nm in norm]
             return vec, norm, length
 
         def sim(vec_hyp, vec_ref, norm_hyp, norm_ref, length_hyp, length_ref):
@@ -172,6 +174,9 @@ class CiderScorer(object):
         # compute log reference length
         if self.df_mode == "corpus":
             self.ref_len = np.log(float(len(self.crefs)))
+        #elif self.df_mode == "coco-val-df":
+        #    # if coco option selected, use length of coco-val set
+        #    self.ref_len = np.log(float(40504))
 
         scores = []
         for test, refs in zip(self.ctest, self.crefs):
