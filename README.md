@@ -18,7 +18,7 @@ When evaluating using one (or few) images, set idf to "coco-val-df" instead,
 which uses IDF from the MSCOCO Vaildation Dataset for reliable results.
 
 To enable the IDF mode "coco-val-df":
-1. Download the [IDF file](https://github.com/ruotianluo/cider/raw/dbb3960165d86202ed3c417b412a000fc8e717f3/data/coco-val.p)
+1. Download the [IDF file](https://github.com/ruotianluo/cider/blob/dbb3960165d86202ed3c417b412a000fc8e717f3/data/coco-val.p)
 1. Rename the file to `coco-val-df.p`
 1. Place the file in `./cider_ruotianluo/data`
 
